@@ -28,45 +28,62 @@ char *filtreString(char *inputString)
 }
 
 // *program run
-void run(void *prBuffer, char *prCode)
+void run(void *prBuffer, char *prCode, char **PsquarBracket)
 {
     void *copy = prBuffer;
     int i = 0;
     int j = 0;
+    int h = 0;
     while(prCode[i])
     {
         if(prCode[i] == '+')
         {
+            // printf("+\n");
             *(char *)prBuffer += 1 ;
         }
         if(prCode[i] == '-')
         {
+            // printf("-\n");
             *(char *)prBuffer -= 1;
         }
         if(prCode[i] == '<')
         {
+            // printf("<\n");
             prBuffer--;
         }
         if(prCode[i] == '>')
         {
+            // printf(">\n");
             prBuffer++;
         }
         if(prCode[i] == '.')
         {
-            // printf("%p : %d\n",(char *)prBuffer,*(char *)prBuffer);
+            printf("printing :%p : %d\n",(char *)prBuffer,*(char *)prBuffer);
             write(1,(char *)prBuffer,1);
         }
-        // if(prCode[i] == '[')
-        // {
-        //     if(*(char *)prBuffer) i++;
-        //     else {
-        //         prBuffer = array[++j];
-        //         j;
-        //     }
-        // }
+        if(prCode[i] == '[')
+        {
+            if(!*(char *)prBuffer)  {
+                j++;
+                prCode = PsquarBracket[1];
+                // printf("[i am here %s\nlenght %ld\n",prCode,strlen(prCode));
+            }
+        }
+        if(prCode[i] == ']')
+        {
+            if(*(char *)prBuffer) {
+                
+                prCode = PsquarBracket[0];
+                i = 0;
+                // printf("]i am here %s\nlenght %ld\n",prCode,strlen(prCode));
+            }
+        }
+
+
+            // printf("buffer  : %d\n",*((char *)prBuffer));
         i++;
     }
-    printf("\nprnt %s\n",(char *)(prBuffer - 2) );
+    // printf("\nprnt %s\n",(char *)(prBuffer - 2) );
 }
 
 // *get the number of square brackets
@@ -227,12 +244,14 @@ char **getPsquarBracket(char *prcode)
 
 int main(int argc,char **argv)
 {
+    char *code = ">+++++++++[<++++++++>-]<.";
+
     //check the nember of arguments
-    if(argc != 2 )
-    {
-        printf("invalid number of arguments\n");
-        return 0;
-    }
+    // if(argc != 2 )
+    // {
+    //     printf("invalid number of arguments\n");
+    //     return 0;
+    // }
 
     // alloc program buffer
     void *program;
@@ -243,22 +262,24 @@ int main(int argc,char **argv)
     }
 
     // filtering the input string from unwanted chars
-    char *new = filtreString(argv[1]);
+    // char *new = filtreString(argv[1]);
 
     printf("check1\n");
     // getting the addresses of the squar brackets
-    char **PsquarBracket = getPsquarBracket(new);
+    char **PsquarBracket = getPsquarBracket(code);
     if(!PsquarBracket)
     {
+        // free(new);
+        free(program);
         return 0;
     }
     
     
     // run the program 
-    run(program,new);
+    run(program, code, PsquarBracket);
 
     free(PsquarBracket);
-    free(new);
+    // free(new);
     free(program);
     return (0);
 }
